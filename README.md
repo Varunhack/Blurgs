@@ -174,8 +174,12 @@ Grouping classes by expected C-band signature (notebook §9):
 | **Forest & shrub** | ≈ 0 until total occlusion |
 
 The small macro-average gains are literally *water gains minus agriculture losses*. Acting on
-this — model H, which routes per class — beats **both** of its parents significantly at 75%, 90%
-and 100% coverage.
+this — model H, which routes per class using validation only — beats **both** of its parents
+significantly at 75%, 90% and 100% coverage.
+
+At 75% coverage this is what the study is ultimately measuring: the best SAR-assisted model gets
+**81 test patches exactly right that the best optical-only model gets wrong**, and the failures
+that remain are label-ambiguity cases rather than degradation-handling cases.
 
 ### Finding 6 — early vs late fusion is a genuine trade-off
 Late fusion is slightly better under partial cloud; **early fusion is much better at total
@@ -183,30 +187,39 @@ optical loss** in all four families (e.g. SimpleCNN 0.711 vs 0.639; VGG 0.711 vs
 trunk can re-purpose its full capacity for SAR when optical is zeroed, whereas a dedicated SAR
 branch trains on weak gradients whenever optical is visible.
 
-### Finding 7 — capacity is not the bottleneck, and shrinking does not help either
+### Finding 7 — capacity is not the bottleneck, and shrinking does not fix it either
 ImageNet-pretrained ResNet-18 is significantly *worse* than the 1.2 M-param baseline everywhere
-(−2 to −3.8 pts) — RGB natural-image features transfer poorly to 12-band multispectral, and it
+(−2 to −3.8 pts): RGB natural-image features transfer poorly to 12-band multispectral, and it
 memorised the training set by epoch 4. The train-test gap grows monotonically with parameter
-count (2.7 → 4.2 → 6.0 pts), which suggested overfitting; but **narrowing the same architectures
-made them monotonically worse**, and VGG11 at half the baseline's parameter count still loses to
-it. So parameter count is not the explanatory variable. The likely cause is the
-**downsampling schedule vs input size**: on 120 px inputs SimpleCNN's feature map reaches global
-pooling at 7×7, while VGG11 ends at 3×3 and ResNet-18 at 4×4 (its stem discards ×4 resolution
-before any real feature extraction). Architectures designed for 224 px ImageNet inputs pool away
-the spatial detail that multi-label land cover depends on.
+count (2.7 → 4.2 → 6.0 pts), which suggested overfitting — so I tested the obvious remedy with a
+**capacity sweep**, retraining VGG11 and ResNet18 at ¼ and ½ width.
+
+It failed: **no width of either architecture reaches the SimpleCNN baseline at any coverage
+level**, and VGG11 at *half* the baseline's parameter count (0.58 M vs 1.18 M) is still
+significantly worse. Parameter count is therefore not the explanatory variable. The likely cause
+is the **downsampling schedule versus input size**: on 120 px inputs SimpleCNN reaches global
+pooling at 7×7, VGG11 at 3×3, ResNet-18 at 4×4 (its stem discards ×4 resolution before any real
+feature extraction). Architectures designed for 224 px ImageNet inputs pool away exactly the
+spatial detail that multi-label land cover depends on.
+
+One practical upside: the miniaturised **VGG11-w32 fusion models keep most of the benefit at a
+fraction of the cost** — w32-D scores 0.7406 at 75% coverage vs full-size VGG11-D's 0.7407 with
+**17× fewer parameters** (2.4 M vs 39.8 M), and beats SimpleCNN significantly at 90%. It does
+collapse at 100% coverage (0.350), so the narrow model trades robustness for efficiency.
 
 ## 7. Representative successes and failures
 
 ![Rescued by SAR](figures/rescued_cases.png)
 
-At 75% coverage, the SAR-assisted model exactly matches the full label set on patches where the
-optical-only model fails (55 such patches; exact-match 11.9% vs 11.1%). Rows: masked optical as
-the model sees it, clean optical for reference, SAR VV.
+At 75% coverage the best SAR-assisted model (VGG11-D, 0.741) exactly matches the full label set
+on **81 test patches where the best optical-only model (SimpleCNN-B, 0.730) fails** — raising
+strict exact-match accuracy from 11.1% to 12.6%. Rows: masked optical as the model sees it,
+clean optical for reference, SAR VV.
 
 - **Successes** cluster where the physics predicts: water bodies and urban structure remain
   visible to radar when the optical view is gone. See also
   [`figures/class_coverage_heatmap.png`](figures/class_coverage_heatmap.png).
-- **Failures** ([`figures/failures_cases.png`](figures/failures_cases.png)) — 1,854 test patches
+- **Failures** ([`figures/failures_cases.png`](figures/failures_cases.png)) — 1,831 test patches
   are wrong under both models, dominated by fine-grained agriculture/forest distinctions
   (*Complex cultivation patterns* vs *Land principally occupied by agriculture*, broad-leaved vs
   mixed forest). These are ambiguous in the **clean** imagery too: they reflect label noise in
@@ -257,7 +270,7 @@ Run the cells top to bottom. The notebook downloads the dataset (~2.4 GB), build
 preprocessed memmaps, then trains. Every stage is cached: the download, the memmaps, the
 normalisation statistics and every model checkpoint are skipped if present.
 
-**Because all 27 checkpoints are committed, a fresh clone skips training entirely** — the
+**Because all 28 checkpoints are committed, a fresh clone skips training entirely** — the
 notebook loads them and goes straight to evaluation and analysis (a few minutes). Set
 `FORCE_RETRAIN = True` in §1 to retrain everything from scratch instead.
 
@@ -278,15 +291,15 @@ history/                            every earlier notebook version, executed, + 
   v4_architecture_matrix.ipynb        iteration 4: full 4x3 architecture matrix
 figures/                            all 12 generated figures
 data/processed/                     all outputs of the study:
-  *.pt                                27 trained model checkpoints (488 MB, all committed)
+  *.pt                                28 trained model checkpoints (~490 MB, all committed)
+  experiment_inventory.csv            index of all 25 training runs (750 epochs total)
   results.csv, bootstrap_ci.csv, ...  every metric table, including superseded iterations
   *_history.csv                       per-epoch training curves for every run
-  experiment_inventory.csv            index of every training run performed
 data/BENv2_lithuania_summer/        (git-ignored) the downloaded dataset, ~2.4 GB
 data/processed/*.npy                (git-ignored) preprocessed memmaps, ~3.4 GB
 ```
 
-**Nothing is cherry-picked.** All 27 checkpoints are committed — including the models that lost
+**Nothing is cherry-picked.** All 28 checkpoints are committed — including the models that lost
 (ImageNet-pretrained, the deep scratch-ResNet, the narrowed architectures) and the superseded
 14-epoch versions of A/B/C from the first iteration. The only exclusions are the downloaded
 dataset and the preprocessed arrays, both of which the notebook regenerates automatically; every
@@ -311,7 +324,7 @@ with the numbers each version produced: [`history/HISTORY.md`](history/HISTORY.m
 Superseded result files are kept deliberately: `results_14ep.csv` (iteration 1, undertrained)
 and `results_30ep_3models.csv` (iteration 2) sit alongside the final `results.csv`.
 
-## 11. External resources used
+## 12. External resources used
 
 - **Dataset**: BigEarthNet v2.0 (reBEN) — Clasen et al., *"reBEN: Refined BigEarthNet Dataset for
   Remote Sensing Image Analysis"*, 2024; accessed via the LMDB conversion
