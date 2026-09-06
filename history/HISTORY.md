@@ -44,7 +44,7 @@ the 1.9 M-param SimpleCNN below 90% — the first sign that capacity was not the
 - **Model H**: selective per-class fusion, choosing between the optical and SAR model per class
   using validation only.
 
-**Result:** SAR deltas positive in 9/9 model×seed comparisons at 75% and 90%. Water gains are
+**Result:** SAR deltas positive in all 6/6 paired comparisons (2 SAR models × 3 seeds) at 75% and 90%. Water gains are
 significant at *every* coverage level ≥25%, while agriculture is significantly *hurt* at 90% —
 the macro average had been hiding two opposite effects. H beat both of its parents.
 

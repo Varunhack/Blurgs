@@ -152,7 +152,7 @@ over 1.2 km are spatially redundant, which limits how much headroom SAR has unde
 
 ### Finding 3 — SAR's benefit is real but concentrated at heavy occlusion
 Confirmed against both noise sources: significant by paired bootstrap at 90% coverage, and the
-paired SAR deltas are positive in **9 of 9** model×seed comparisons at both 75% and 90%. At 100%
+paired SAR deltas are positive in **all 6 of 6** paired comparisons (2 SAR models × 3 seeds) at both 75% and 90%. At 100%
 coverage the effect is decisive — SAR-assisted models hold ~0.71 (≈ 95% of clean-optical
 performance) while every optical-only model collapses to label-prior guessing.
 **SAR is insurance against near-total optical loss**, not a booster under light cloud.
@@ -317,7 +317,7 @@ with the numbers each version produced: [`history/HISTORY.md`](history/HISTORY.m
 |---|---|---|
 | **v1** | baseline A, mask-augmented B, early-fusion C; 14 → 30 epochs | A collapses under masking; C only clearly wins at 100% coverage. The 50% gap flipped sign between the 14- and 30-epoch runs → motivated real statistics |
 | **v2** | paired bootstrap CIs; late fusion D; deep dual-encoder E | SAR significant only at ≥90%; **E significantly worse than the small baseline** — first hint capacity wasn't the issue |
-| **v3** | seed replicates; class-conditional analysis; selective fusion H | SAR deltas positive 9/9 across seeds; **water helped at every level ≥25%, agriculture hurt at 90%** — the macro average was hiding opposite effects |
+| **v3** | seed replicates; class-conditional analysis; selective fusion H | SAR deltas positive in 6/6 paired comparisons across seeds; **water helped at every level ≥25%, agriculture hurt at 90%** — the macro average was hiding opposite effects |
 | **v4** | VGG11, ResNet18-scratch, ImageNet-pretrained ResNet18 × B/C/D; accuracy metrics | **VGG11 unlocked significant SAR gains from 50% upward**; ImageNet pretraining failed outright |
 | **final** | capacity diagnosis + width sweep; formulation evidence; experiment inventory | Shrinking the architectures made them **monotonically worse** → the problem is the downsampling schedule vs 120 px inputs, not parameter count |
 
