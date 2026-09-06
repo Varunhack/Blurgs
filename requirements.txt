@@ -1,0 +1,20 @@
+# Python 3.13, Windows 11, NVIDIA RTX 4060 Laptop (8 GB), CUDA 12.8
+# Install PyTorch first from the CUDA index, then the rest:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#   pip install -r requirements.txt
+# (CPU-only works too — drop the index URL — but expect ~10x longer training.)
+
+torch==2.11.0
+torchvision==0.26.0
+numpy==2.4.2
+pandas==3.0.1
+scipy==1.17.1
+scikit-learn==1.8.0
+matplotlib==3.10.9
+lmdb==2.3.0
+safetensors==0.8.0
+huggingface-hub==1.30.0
+pyarrow==25.0.1
+tqdm==4.67.3
+nbformat==5.11.1
+ipykernel==7.3.0

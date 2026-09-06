@@ -1,0 +1,21 @@
+# ------------------------------------------------------------------
+# What is EXCLUDED and why
+#
+# Only two things are excluded, and both are bulk data that the notebook
+# regenerates automatically — everything else (all 27 model checkpoints,
+# every result file, every notebook version) IS committed on purpose, so
+# the full trail of the work is visible.
+# ------------------------------------------------------------------
+
+# The downloaded BigEarthNet subset (~2.4 GB) — fetched by notebook §2 in one line
+data/BENv2_lithuania_summer/
+
+# Preprocessed memory-mapped arrays (~3.4 GB) — rebuilt by notebook §4 from the above
+data/processed/*.npy
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
