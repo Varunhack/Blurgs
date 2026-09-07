@@ -49,14 +49,15 @@ size that fits comfortably on one laptop GPU — the full archive is 549,488 pat
   degradation in the experiment is the controlled kind (this subset contains zero — the optical
   baseline really is cloud-free).
 - Kept the **11 classes with ≥ 1,000 positive patches**; the other 6 have < 350 positives (some
-  < 100) and cannot be trained or evaluated reliably at this scale. 8,747 patches retained.
+  < 100) and cannot be trained or evaluated reliably at this scale. Exactly one patch had no
+  positive among the 11, leaving **8,774** of 8,775.
 - Bands arrive at native resolution (10 m → 120², 20 m → 60², 60 m → 20²); all are bilinearly
   resampled to the common 120×120 10 m grid and cached as `float16` memmaps.
 - Normalisation statistics computed on the **training split only**.
 
 | split | patches |
 |---|---|
-| train | 4,206 |
+| train | 4,205 |
 | validation | 2,418 |
 | test | 2,151 |
 
