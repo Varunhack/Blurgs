@@ -114,6 +114,9 @@ Plus two extras:
 
 Metrics: **macro-F1** (primary — insensitive to class imbalance), **mAP** (threshold-free),
 **label accuracy** (per-label binary accuracy) and **subset accuracy** (exact match, strictest).
+Reference points on the test split: predicting *always negative* scores 0.000 macro-F1 but 0.639
+label accuracy, and *always positive* scores 0.504 macro-F1 — so macro-F1's meaningful range here
+is roughly 0.50–1.00, and label accuracy's is 0.64–1.00.
 The decision threshold is fixed at 0.5 throughout — deliberately untuned.
 
 Three layers of rigour, because the effects being measured are small:
